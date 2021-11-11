@@ -1,0 +1,14 @@
+{
+  "name": "demo-webrtc-sdk",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "@telnyx/webrtc": "^2.6.0",
+    "vite": "^2.6.4"
+  }
+}
