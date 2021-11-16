@@ -6,3 +6,18 @@ body {
   color: #2c3e50;
   margin-top: 60px;
 }
+
+.row {
+  display: flex;
+  justify-content: center;
+}
+
+.block {
+  display: block;
+  pointer-events: auto;
+}
+
+.hidden {
+  display: none;
+  pointer-events: none;
+}
