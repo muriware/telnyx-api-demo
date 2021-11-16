@@ -2,12 +2,10 @@ import { TelnyxRTC } from '@telnyx/webrtc';
 import './style.css';
 
 let client;
+let currentCall;
 
 const username = document.getElementById('username');
 const password = document.getElementById('password');
-const idname = document.getElementById('idname');
-const idnumber = document.getElementById('idnumber');
-const destination = document.getElementById('destination');
 const connect = document.getElementById('connect');
 const reconnect = document.getElementById('reconnect');
 const call = document.getElementById('call');
@@ -17,6 +15,8 @@ const log = document.getElementById('log');
 onDocumentReady(function () {
   connect.addEventListener('click', onConnect);
   reconnect.addEventListener('click', onReconnect);
+  call.addEventListener('click', onCall);
+  hangup.addEventListener('click', onHangup);
 });
 
 function onConnect() {
@@ -78,13 +78,21 @@ function onDisconnect() {
   call.disabled = true;
 }
 
-call.onclick = () => {
-  const call = client.newCall({
-    callerName: idname.value,
-    callerNumber: idnumber.value,
-    destinationNumber: destination.value,
-  });
-};
+function onCall() {
+  const params = {
+    callerName: document.getElementById('idname').value,
+    callerNumber: document.getElementById('idname').value,
+    destinationNumber: document.getElementById('destination').value,
+  };
+
+  currentCall = client.newCall(params);
+}
+
+function onHangup() {
+  if (currentCall) {
+    currentCall.hangup();
+  }
+}
 
 function needsCredentials() {
   return !username.value || !password.value ? true : false;
