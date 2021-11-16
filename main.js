@@ -15,6 +15,7 @@ const hangup = document.getElementById('hangup');
 const log = document.getElementById('log');
 
 onDocumentReady(function () {
+  connect.addEventListener('click', onConnect);
   reconnect.addEventListener('click', onReconnect);
 });
 
@@ -23,41 +24,44 @@ function removeTelnyxClientEvents() {
   client.off('telnyx.notification');
 }
 
-// TODO: call onConnect method.
-function onReconnect() {
-  client.disconnect();
-  removeTelnyxClientEvents();
-
-  log.insertAdjacentHTML('afterbegin', 'unregistered\n');
-  connect.className = 'block';
-  reconnect.className = 'hidden';
-  call.disabled = true;
-}
-
-connect.onclick = () => {
+function onConnect() {
   client = new TelnyxRTC({
     login: username.value,
     password: password.value,
   });
 
-  // Attach event listeners
+  client.remoteElement = 'remote';
+
   client
     .on('telnyx.ready', () => {
-      log.insertAdjacentHTML('afterbegin', 'registered\n');
+      logEvent('registered');
       connect.className = 'hidden';
       reconnect.className = 'block';
       call.disabled = false;
     })
     .on('telnyx.notification', (notification) => {
-      log.insertAdjacentHTML('afterbegin', `${notification.call.state}\n`);
+      logEvent(notification.call.state);
     });
 
-  // Connect and login
   client.connect();
-};
+}
+
+function onReconnect() {
+  client.disconnect();
+  removeTelnyxClientEvents();
+  logEvent('unregistered');
+  call.disabled = true;
+
+  // Don't attempt to reconnect without credentials
+  if (!username.value || !password.value) {
+    connect.className = 'block';
+    reconnect.className = 'hidden';
+  } else {
+    onConnect();
+  }
+}
 
 call.onclick = () => {
-  client.remoteElement = 'remote';
   const call = client.newCall({
     callerName: idname.value,
     callerNumber: idnumber.value,
