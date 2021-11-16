@@ -14,16 +14,27 @@ const call = document.getElementById('call');
 const hangup = document.getElementById('hangup');
 const log = document.getElementById('log');
 
-connect.onclick = () => {
-  if (connect.innerText === 'Reconnect') {
-    // Disconnecting and Removing listeners.
-    client.disconnect();
-    client.off('telnyx.ready');
-    client.off('telnyx.notification');
-    log.insertAdjacentHTML('afterbegin', 'unregistered\n');
-    call.disabled = true;
-  }
+onDocumentReady(function () {
+  reconnect.addEventListener('click', onReconnect);
+});
 
+function removeTelnyxClientEvents() {
+  client.off('telnyx.ready');
+  client.off('telnyx.notification');
+}
+
+// TODO: call onConnect method.
+function onReconnect() {
+  client.disconnect();
+  removeTelnyxClientEvents();
+
+  log.insertAdjacentHTML('afterbegin', 'unregistered\n');
+  connect.className = 'block';
+  reconnect.className = 'hidden';
+  call.disabled = true;
+}
+
+connect.onclick = () => {
   client = new TelnyxRTC({
     login: username.value,
     password: password.value,
@@ -33,7 +44,8 @@ connect.onclick = () => {
   client
     .on('telnyx.ready', () => {
       log.insertAdjacentHTML('afterbegin', 'registered\n');
-      connect.textContent = 'Reconnect';
+      connect.className = 'hidden';
+      reconnect.className = 'block';
       call.disabled = false;
     })
     .on('telnyx.notification', (notification) => {
@@ -52,3 +64,7 @@ call.onclick = () => {
     destinationNumber: destination.value,
   });
 };
+
+function onDocumentReady(callback) {
+  document.addEventListener('DOMContentLoaded', callback);
+}
