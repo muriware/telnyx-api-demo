@@ -68,3 +68,7 @@ call.onclick = () => {
 function onDocumentReady(callback) {
   document.addEventListener('DOMContentLoaded', callback);
 }
+
+function logEvent(message) {
+  log.insertAdjacentHTML('afterbegin', `${message}\n`);
+}
