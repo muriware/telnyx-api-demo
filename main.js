@@ -8,12 +8,12 @@ const password = document.getElementById('password');
 const idname = document.getElementById('idname');
 const idnumber = document.getElementById('idnumber');
 const destination = document.getElementById('destination');
-const register = document.getElementById('register');
+const connect = document.getElementById('connect');
 const call = document.getElementById('call');
 const log = document.getElementById('log');
 
-register.onclick = () => {
-  if (register.innerText === 'Reconnect') {
+connect.onclick = () => {
+  if (connect.innerText === 'Reconnect') {
     // Disconnecting and Removing listeners.
     client.disconnect();
     client.off('telnyx.ready');
@@ -31,7 +31,7 @@ register.onclick = () => {
   client
     .on('telnyx.ready', () => {
       log.insertAdjacentHTML('afterbegin', 'registered\n');
-      register.textContent = 'Reconnect';
+      connect.textContent = 'Reconnect';
       call.disabled = false;
     })
     .on('telnyx.notification', (notification) => {
