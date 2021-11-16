@@ -9,7 +9,9 @@ const idname = document.getElementById('idname');
 const idnumber = document.getElementById('idnumber');
 const destination = document.getElementById('destination');
 const connect = document.getElementById('connect');
+const reconnect = document.getElementById('reconnect');
 const call = document.getElementById('call');
+const hangup = document.getElementById('hangup');
 const log = document.getElementById('log');
 
 connect.onclick = () => {
