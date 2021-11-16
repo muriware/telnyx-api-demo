@@ -2,7 +2,7 @@ import { TelnyxRTC } from '@telnyx/webrtc';
 import './style.css';
 
 let client;
-let currentCall;
+let currentCall = null;
 
 const username = document.getElementById('username');
 const password = document.getElementById('password');
@@ -44,12 +44,13 @@ function onConnect() {
   });
 
   client.on('telnyx.socket.close', () => {
-    console.log('error');
     onDisconnect();
   });
 
   client.on('telnyx.notification', (notification) => {
-    logEvent(notification.call.state);
+    if (notification.type === 'callUpdate') {
+      onCallUpdate(notification.call);
+    }
   });
 
   client.connect();
@@ -79,18 +80,51 @@ function onDisconnect() {
 }
 
 function onCall() {
+  const destinationNumber = document.getElementById('destination').value;
+
   const params = {
     callerName: document.getElementById('idname').value,
     callerNumber: document.getElementById('idname').value,
-    destinationNumber: document.getElementById('destination').value,
+    destinationNumber,
   };
 
+  logEvent(`Calling: ${destinationNumber}`);
   currentCall = client.newCall(params);
 }
 
 function onHangup() {
   if (currentCall) {
     currentCall.hangup();
+  }
+}
+
+function onCallUpdate(call) {
+  currentCall = call;
+  const prepend = 'Call state:';
+
+  switch (call.state) {
+    case 'new':
+      logEvent(`${prepend} new`);
+      break;
+    case 'trying':
+      logEvent(`${prepend} connecting`);
+      break;
+    case 'active':
+      logEvent(`${prepend} active`);
+      call.className = 'hidden';
+      hangup.className = 'block';
+      break;
+    case 'hangup':
+      logEvent(`${prepend} done`);
+      call.className = 'block';
+      hangup.className = 'hidden';
+      break;
+    case 'destroy':
+      currentCall = null;
+      logEvent(`${prepend} done`);
+      break;
+    default:
+      currentCall.hangup();
   }
 }
 
