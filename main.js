@@ -19,12 +19,11 @@ onDocumentReady(function () {
   reconnect.addEventListener('click', onReconnect);
 });
 
-function removeTelnyxClientEvents() {
-  client.off('telnyx.ready');
-  client.off('telnyx.notification');
-}
-
 function onConnect() {
+  if (needsCredentials()) {
+    return;
+  }
+
   client = new TelnyxRTC({
     login: username.value,
     password: password.value,
@@ -32,16 +31,26 @@ function onConnect() {
 
   client.remoteElement = 'remote';
 
-  client
-    .on('telnyx.ready', () => {
-      logEvent('registered');
-      connect.className = 'hidden';
-      reconnect.className = 'block';
-      call.disabled = false;
-    })
-    .on('telnyx.notification', (notification) => {
-      logEvent(notification.call.state);
-    });
+  client.on('telnyx.ready', () => {
+    logEvent('registered');
+    connect.className = 'hidden';
+    reconnect.className = 'block';
+    call.disabled = false;
+  });
+
+  client.on('telnyx.error', (error) => {
+    console.error(error);
+    onDisconnect();
+  });
+
+  client.on('telnyx.socket.close', () => {
+    console.log('error');
+    onDisconnect();
+  });
+
+  client.on('telnyx.notification', (notification) => {
+    logEvent(notification.call.state);
+  });
 
   client.connect();
 }
@@ -52,13 +61,21 @@ function onReconnect() {
   logEvent('unregistered');
   call.disabled = true;
 
-  // Don't attempt to reconnect without credentials
-  if (!username.value || !password.value) {
+  if (needsCredentials()) {
     connect.className = 'block';
     reconnect.className = 'hidden';
   } else {
     onConnect();
   }
+}
+
+function onDisconnect() {
+  client.disconnect();
+  removeTelnyxClientEvents();
+  logEvent('disconnected');
+  connect.className = 'block';
+  reconnect.className = 'hidden';
+  call.disabled = true;
 }
 
 call.onclick = () => {
@@ -69,10 +86,19 @@ call.onclick = () => {
   });
 };
 
-function onDocumentReady(callback) {
-  document.addEventListener('DOMContentLoaded', callback);
+function needsCredentials() {
+  return !username.value || !password.value ? true : false;
+}
+
+function removeTelnyxClientEvents() {
+  client.off('telnyx.ready');
+  client.off('telnyx.notification');
 }
 
 function logEvent(message) {
   log.insertAdjacentHTML('afterbegin', `${message}\n`);
+}
+
+function onDocumentReady(callback) {
+  document.addEventListener('DOMContentLoaded', callback);
 }
