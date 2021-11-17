@@ -3,6 +3,7 @@ import './style.css';
 
 let client;
 let currentCall = null;
+let isMute = false;
 
 const username = document.getElementById('username');
 const password = document.getElementById('password');
@@ -12,7 +13,11 @@ const destination = document.getElementById('destination');
 const connect = document.getElementById('connect');
 const reconnect = document.getElementById('reconnect');
 const callBtn = document.getElementById('call');
+const mute = document.getElementById('mute');
+const unmute = document.getElementById('unmute');
 const hangup = document.getElementById('hangup');
+const hold = document.getElementById('hold');
+const unhold = document.getElementById('unhold');
 const log = document.getElementById('log');
 
 onDocumentReady(function () {
@@ -24,7 +29,11 @@ onDocumentReady(function () {
   connect.addEventListener('click', onConnect);
   reconnect.addEventListener('click', onReconnect);
   callBtn.addEventListener('click', onCall);
+  mute.addEventListener('click', toggleMute);
+  unmute.addEventListener('click', toggleMute);
   hangup.addEventListener('click', onHangup);
+  hold.addEventListener('click', toggleHold);
+  unhold.addEventListener('click', toggleHold);
 
   username.value = localStorage.getItem('telnyx.demo.username') || '';
   password.value = localStorage.getItem('telnyx.demo.password') || '';
@@ -110,6 +119,29 @@ function onHangup() {
   }
 }
 
+function toggleMute() {
+  if (currentCall) {
+    currentCall.toggleAudioMute();
+    isMute = !isMute;
+
+    if (isMute) {
+      logEvent(`Call state: muted`);
+      mute.className = 'hidden';
+      unmute.className = 'block';
+    } else {
+      logEvent(`Call state: active`);
+      mute.className = 'block';
+      unmute.className = 'hidden';
+    }
+  }
+}
+
+async function toggleHold() {
+  if (currentCall) {
+    await currentCall.toggleHold();
+  }
+}
+
 function onCallUpdate(call) {
   console.log(call.state);
   console.log(call.cause);
@@ -121,21 +153,41 @@ function onCallUpdate(call) {
       logEvent(`${prepend} new`);
       break;
     case 'trying':
+    case 'requesting':
+    case 'recovering':
+    case 'early':
       logEvent(`${prepend} connecting`);
       break;
     case 'active':
       logEvent(`${prepend} active`);
       callBtn.className = 'hidden';
       hangup.className = 'block';
+      hold.className = 'block';
+      unhold.className = 'hidden';
+
+      if (!isMute) {
+        mute.className = 'block';
+      }
+      break;
+    case 'held':
+      logEvent(`${prepend} held`);
+      hold.className = 'hidden';
+      unhold.className = 'block';
       break;
     case 'hangup':
-      logEvent(`${prepend} done`);
+      logEvent(`${prepend} done (${call.cause})`);
       callBtn.className = 'block';
+      mute.className = 'hidden';
+      unmute.className = 'hidden';
       hangup.className = 'hidden';
+      hold.className = 'hidden';
+      unhold.className = 'hidden';
       break;
     case 'destroy':
       currentCall = null;
-      logEvent(`${prepend} done`);
+      logEvent(`${prepend} done (${call.cause})`);
+      break;
+    default:
       break;
   }
 }
