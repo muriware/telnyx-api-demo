@@ -6,6 +6,9 @@ let currentCall = null;
 
 const username = document.getElementById('username');
 const password = document.getElementById('password');
+const idname = document.getElementById('idname');
+const idnumber = document.getElementById('idnumber');
+const destination = document.getElementById('destination');
 const connect = document.getElementById('connect');
 const reconnect = document.getElementById('reconnect');
 const callBtn = document.getElementById('call');
@@ -13,10 +16,21 @@ const hangup = document.getElementById('hangup');
 const log = document.getElementById('log');
 
 onDocumentReady(function () {
+  username.addEventListener('change', saveLocalStorage);
+  password.addEventListener('change', saveLocalStorage);
+  idname.addEventListener('change', saveLocalStorage);
+  idnumber.addEventListener('change', saveLocalStorage);
+  destination.addEventListener('change', saveLocalStorage);
   connect.addEventListener('click', onConnect);
   reconnect.addEventListener('click', onReconnect);
   callBtn.addEventListener('click', onCall);
   hangup.addEventListener('click', onHangup);
+
+  username.value = localStorage.getItem('telnyx.demo.username') || '';
+  password.value = localStorage.getItem('telnyx.demo.password') || '';
+  idname.value = localStorage.getItem('telnyx.demo.idname') || '';
+  idnumber.value = localStorage.getItem('telnyx.demo.idnumber') || '';
+  destination.value = localStorage.getItem('telnyx.demo.destination') || '';
 });
 
 function onConnect() {
@@ -80,15 +94,13 @@ function onDisconnect() {
 }
 
 function onCall() {
-  const destinationNumber = document.getElementById('destination').value;
-
   const params = {
-    callerName: document.getElementById('idname').value,
-    callerNumber: document.getElementById('idnumber').value,
-    destinationNumber,
+    callerName: idname.value,
+    callerNumber: idnumber.value,
+    destinationNumber: destination.value,
   };
 
-  logEvent(`Calling: ${destinationNumber}`);
+  logEvent(`Calling: ${destination.value}`);
   currentCall = client.newCall(params);
 }
 
@@ -99,6 +111,8 @@ function onHangup() {
 }
 
 function onCallUpdate(call) {
+  console.log(call.state);
+  console.log(call.cause);
   currentCall = call;
   const prepend = 'Call state:';
 
@@ -140,5 +154,10 @@ function logEvent(message) {
 }
 
 function onDocumentReady(callback) {
-  document.addEventListener('DOMContentLoaded', callback);;
+  document.addEventListener('DOMContentLoaded', callback);
+}
+
+function saveLocalStorage(event) {
+  const key = event.target.name || event.target.id;
+  localStorage.setItem(`telnyx.demo.${key}`, event.target.value);
 }
