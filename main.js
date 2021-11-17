@@ -8,14 +8,14 @@ const username = document.getElementById('username');
 const password = document.getElementById('password');
 const connect = document.getElementById('connect');
 const reconnect = document.getElementById('reconnect');
-const call = document.getElementById('call');
+const callBtn = document.getElementById('call');
 const hangup = document.getElementById('hangup');
 const log = document.getElementById('log');
 
 onDocumentReady(function () {
   connect.addEventListener('click', onConnect);
   reconnect.addEventListener('click', onReconnect);
-  call.addEventListener('click', onCall);
+  callBtn.addEventListener('click', onCall);
   hangup.addEventListener('click', onHangup);
 });
 
@@ -35,7 +35,7 @@ function onConnect() {
     logEvent('registered');
     connect.className = 'hidden';
     reconnect.className = 'block';
-    call.disabled = false;
+    callBtn.disabled = false;
   });
 
   client.on('telnyx.error', (error) => {
@@ -60,7 +60,7 @@ function onReconnect() {
   client.disconnect();
   removeTelnyxClientEvents();
   logEvent('unregistered');
-  call.disabled = true;
+  callBtn.disabled = true;
 
   if (needsCredentials()) {
     connect.className = 'block';
@@ -76,7 +76,7 @@ function onDisconnect() {
   logEvent('disconnected');
   connect.className = 'block';
   reconnect.className = 'hidden';
-  call.disabled = true;
+  callBtn.disabled = true;
 }
 
 function onCall() {
@@ -84,7 +84,7 @@ function onCall() {
 
   const params = {
     callerName: document.getElementById('idname').value,
-    callerNumber: document.getElementById('idname').value,
+    callerNumber: document.getElementById('idnumber').value,
     destinationNumber,
   };
 
@@ -111,20 +111,18 @@ function onCallUpdate(call) {
       break;
     case 'active':
       logEvent(`${prepend} active`);
-      call.className = 'hidden';
+      callBtn.className = 'hidden';
       hangup.className = 'block';
       break;
     case 'hangup':
       logEvent(`${prepend} done`);
-      call.className = 'block';
+      callBtn.className = 'block';
       hangup.className = 'hidden';
       break;
     case 'destroy':
       currentCall = null;
       logEvent(`${prepend} done`);
       break;
-    default:
-      currentCall.hangup();
   }
 }
 
@@ -142,5 +140,5 @@ function logEvent(message) {
 }
 
 function onDocumentReady(callback) {
-  document.addEventListener('DOMContentLoaded', callback);
+  document.addEventListener('DOMContentLoaded', callback);;
 }
