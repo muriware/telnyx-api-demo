@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import { errorHandler } from './middleware/error.middleware';
 import { notFoundHandler } from './middleware/not-found.middleware';
 import { credentialRouter } from './credential/credential.router';
+import { dialRouter } from './dial/dial.router';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/v1/call-control/credential', credentialRouter);
+app.use('/v1/call-control/dial', dialRouter);
 
 app.use(errorHandler);
 app.use(notFoundHandler);
