@@ -7,6 +7,7 @@ import { errorHandler } from './middleware/error.middleware';
 import { notFoundHandler } from './middleware/not-found.middleware';
 import { credentialRouter } from './credential/credential.router';
 import { dialRouter } from './dial/dial.router';
+import { webhookRouter } from './webhook/webhook.router';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use(express.json());
 
 app.use('/v1/call-control/credential', credentialRouter);
 app.use('/v1/call-control/dial', dialRouter);
+app.use('/v1/call-control/webhook', webhookRouter);
 
 app.use(errorHandler);
 app.use(notFoundHandler);
