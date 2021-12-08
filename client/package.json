@@ -2,10 +2,8 @@
   "name": "telnyx-api-demo-client",
   "version": "0.0.0",
   "license": "MIT",
-  "source": "src/index.html",
   "scripts": {
-    "dev": "parcel",
-    "build": "parcel build"
+    "cc": "parcel call-control/index.html"
   },
   "dependencies": {
     "@telnyx/webrtc": "^2.6.0",
