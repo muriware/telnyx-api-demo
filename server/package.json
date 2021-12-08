@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node-dev --respawn --pretty --transpile-only src/index.ts"
+    "cc": "ts-node-dev --respawn --pretty --transpile-only call-control/index.ts"
   },
   "dependencies": {
     "axios": "^0.24.0",

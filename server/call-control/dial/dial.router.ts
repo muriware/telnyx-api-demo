@@ -19,7 +19,7 @@ dialRouter.post('/', async (req: Request, res: Response) => {
     const params: Data = {
       connection_id: process.env.TELNYX_CALL_CONTROL_CONNECTION_ID || '',
       to: `sip:${sip_username}@sip.telnyx.com`,
-      from: process.env.TELNYX_PHONE_NUMBER || '',
+      from: caller_id_number,
       client_state: clientState,
     };
 
